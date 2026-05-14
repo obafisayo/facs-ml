@@ -12,6 +12,7 @@ import streamlit as st
 import tensorflow as tf
 from deepface import DeepFace
 from PIL import Image
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input as mobilenet_preprocess
 
 # ── Constants ──────────────────────────────────────────────────────
 IMG_SIZE = (224, 224)
@@ -29,7 +30,7 @@ def load_visibility_model():
 
 # ── Core logic ─────────────────────────────────────────────────────
 def check_visibility(model, img: Image.Image):
-    arr = np.array(img.convert("RGB").resize(IMG_SIZE), dtype=np.float32) / 255.0
+    arr = mobilenet_preprocess(np.array(img.convert("RGB").resize(IMG_SIZE), dtype=np.float32))
     pred = model.predict(np.expand_dims(arr, 0), verbose=0)[0]
     idx = int(np.argmax(pred))
     return VISIBILITY_LABELS[idx], float(pred[idx])
